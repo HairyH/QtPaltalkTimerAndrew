@@ -1,0 +1,2 @@
+HairyH, 180;
+MaxTimer, 60;
