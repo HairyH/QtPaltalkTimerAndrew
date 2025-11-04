@@ -98,17 +98,21 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
 	InitCommonControls();
 	LoadLibraryW(L"riched20.dll"); // comment if richedit is not used
 
-	OutputDebugStringA("[COM] Attempting to initialize COM...\n");
+	//OutputDebugStringA("[COM] Attempting to initialize COM...\n");
 	HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 	if (FAILED(hr)) {
+#ifdef DEBUG
 		char szMsg[128];
 		sprintf_s(szMsg, sizeof(szMsg), "[COM] CoInitializeEx FAILED! HRESULT=0x%08X\n", hr);
 		OutputDebugStringA(szMsg);
+#endif // DEBUG
 		msga("CoInitializeEx Failed!");
 		return 2;
 	}
 	else {
-		OutputDebugStringA("[COM] COM initialized successfully (STA mode).\n");
+#ifdef DEBUG
+	OutputDebugStringA("[COM] COM initialized successfully (STA mode).\n");
+#endif // DEBUG
 	}
 
 	// Run the main dialog
@@ -278,7 +282,10 @@ void GetPaltalkWindows(void)
 	// Getting the Emoji Text Edit control UIAutomation element to send text to Paltalk
 	HRESULT hr = GetUIAutomationElementFromHWNDAndClassName(ghPtMain, L"ui::controls::EmojiTextEdit", &emojiTextEditElement);
 	if (FAILED(hr)) {
-		std::cerr << "GetUIAutomationElementFromHWNDAndClassName failed: " << std::hex << hr << std::endl;
+#ifdef DEBUG
+		OutputDebugStringA("GetUIAutomationElementFromHWNDAndClassName failed");
+#endif // DEBUG
+
 	}
 	// Get the Chat Room windows handle
 	if (ghPtRoom) 
@@ -389,7 +396,6 @@ BOOL InitMicLimits(void)
 	SendMessageW(ghLimit, CB_SETCURSEL, (WPARAM)2, (LPARAM)2);
 	giLimit = SendMessageW(ghLimit, CB_GETITEMDATA, (WPARAM)2, (LPARAM)0);
 	return TRUE;
-
 }
 
 /// Initialise the Clock Display Window
@@ -419,14 +425,19 @@ void MicTimerStart(void)
 		// Check if there is a specific limit for the current nick
 		if (SetLimitForNick(std::string(gszCurrentNick)))
 		{
+#ifdef DEBUG
 			char szTempNickLimit[100] = { 0 };
 			sprintf_s(szTempNickLimit, "Nick %s has specific mic limit of %d seconds\n", gszCurrentNick, giLimit);
 			OutputDebugStringA(szTempNickLimit);
+#endif // DEBUG
+
 		}
 	}
+#ifdef DEBUG	
 	char szTemp[100] = { 0 };
 	sprintf_s(szTemp, "giLimit = %d \n", giLimit);
 	OutputDebugStringA(szTemp);
+#endif // DEBUG
 	SetTimer(ghMain, IDT_MICTIMER, 1000, 0);
 }
 
